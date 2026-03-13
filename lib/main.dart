@@ -21,11 +21,11 @@ const String _baseUrl = "https://flicksize.com/krishi_plus/";
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const FarmersWeatherApp());
+  runApp(const TestApp());
 }
 
-class FarmersWeatherApp extends StatelessWidget {
-  const FarmersWeatherApp({super.key});
+class TestApp extends StatelessWidget {
+  const TestApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +46,7 @@ class FarmersWeatherApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        title: 'কৃষি সেবা',
+        title: 'TestApp',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           useMaterial3: true,
@@ -85,10 +85,12 @@ class _AuthGateState extends State<_AuthGate> {
 
   Future<bool> _checkAlreadySubscribed(String phone) async {
     try {
-      final response = await http.post(
-        Uri.parse('${_baseUrl}check_subscription.php'),
-        body: {'user_mobile': phone},
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .post(
+            Uri.parse('${_baseUrl}check_subscription.php'),
+            body: {'user_mobile': phone},
+          )
+          .timeout(const Duration(seconds: 10));
 
       if (response.statusCode != 200) {
         return false;
@@ -100,7 +102,8 @@ class _AuthGateState extends State<_AuthGate> {
         return false;
       }
 
-      final status = decoded['subscriptionStatus']?.toString().trim().toUpperCase() ?? '';
+      final status =
+          decoded['subscriptionStatus']?.toString().trim().toUpperCase() ?? '';
       final isSubscribed = status == 'REGISTERED';
 
       return isSubscribed;

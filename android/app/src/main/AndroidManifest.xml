@@ -13,7 +13,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
-        android:label="কৃষি সেবা প্লাস"
+        android:label="TestApp"
         android:name="${applicationName}"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
