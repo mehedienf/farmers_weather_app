@@ -1,21 +1,9 @@
-import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'providers/app_provider.dart';
-import 'providers/weather_provider.dart';
-import 'providers/forecast_provider.dart';
-import 'providers/admin_notification_provider.dart';
-
 import 'login.dart';
-import 'krishok_page.dart';
-import 'forecast_page.dart';
-import 'live_services_page.dart';
-import 'widgets/signal_aura.dart';
-import 'services/notification_service.dart';
 
 const String _baseUrl = "https://flicksize.com/krishi_plus/";
 
@@ -29,39 +17,21 @@ class TestApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AppProvider()),
-        ChangeNotifierProvider(create: (_) => WeatherProvider()),
-        ChangeNotifierProvider(
-          create: (_) => AdminNotificationProvider()..load(),
+    return MaterialApp(
+      title: 'TestApp',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF16A34A),
+          brightness: Brightness.light,
         ),
-        ChangeNotifierProxyProvider<AppProvider, ForecastProvider>(
-          create: (_) => ForecastProvider(),
-          update: (_, app, forecast) {
-            final fp = forecast ?? ForecastProvider();
-            fp.fetchForLocation(app.latitude, app.longitude);
-            return fp;
-          },
-        ),
-      ],
-      child: MaterialApp(
-        title: 'TestApp',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF16A34A),
-            brightness: Brightness.light,
-          ),
-          scaffoldBackgroundColor: const Color(0xFFFFFFFF),
-        ),
-        home: const _AuthGate(),
-        routes: {
-          '/login': (_) => const LoginPage(),
-          '/home': (_) => const _AppInitializer(),
-        },
       ),
+      home: const _AuthGate(),
+      routes: {
+        '/login': (_) => const LoginPage(),
+        '/home': (_) => const HomePage(),
+      },
     );
   }
 }
@@ -144,112 +114,15 @@ class _AuthGateState extends State<_AuthGate> {
     if (_loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    return _goHome ? const _AppInitializer() : const LoginPage();
+    return _goHome ? const HomePage() : const LoginPage();
   }
 }
 
-class _AppInitializer extends StatefulWidget {
-  const _AppInitializer();
-
-  @override
-  State<_AppInitializer> createState() => _AppInitializerState();
-}
-
-class _AppInitializerState extends State<_AppInitializer> {
-  bool _loading = true;
-  Timer? _timer;
-  late final NotificationService _notifService;
-
-  @override
-  void initState() {
-    super.initState();
-    _notifService = NotificationService();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      _notifService.initialize(context, () {});
-      await context.read<AppProvider>().fetchCurrentLocation();
-      if (mounted) {
-        final app = context.read<AppProvider>();
-        context.read<WeatherProvider>().loadWeather(
-          app.latitude,
-          app.longitude,
-        );
-        _startClock();
-        setState(() => _loading = false);
-      }
-    });
-  }
-
-  void _startClock() {
-    context.read<AppProvider>().refreshDateTime();
-    _timer = Timer.periodic(const Duration(minutes: 1), (_) {
-      if (mounted) context.read<AppProvider>().refreshDateTime();
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-    return const _MainNavigator();
-  }
-}
-
-class _MainNavigator extends StatefulWidget {
-  const _MainNavigator();
-
-  @override
-  State<_MainNavigator> createState() => _MainNavigatorState();
-}
-
-class _MainNavigatorState extends State<_MainNavigator> {
-  int _index = 0;
-
-  void _goto(int i) => setState(() => _index = i);
-
-  @override
-  Widget build(BuildContext context) {
-    final pages = [
-      KrishokPage(onMenuTap: () => _goto(1)),
-      ForecastPage(onMenuTap: () => _goto(1)),
-      LiveServicesPage(onMenuTap: () => _goto(0)),
-    ];
-
-    return Stack(
-      children: [
-        Scaffold(
-          body: IndexedStack(index: _index, children: pages),
-          bottomNavigationBar: NavigationBar(
-            selectedIndex: _index,
-            onDestinationSelected: _goto,
-            backgroundColor: Colors.white,
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.agriculture_outlined),
-                selectedIcon: Icon(Icons.agriculture_rounded),
-                label: 'কৃষক সেবা',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.cloud_outlined),
-                selectedIcon: Icon(Icons.cloud_rounded),
-                label: 'আবহাওয়া',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.language_outlined),
-                selectedIcon: Icon(Icons.language_rounded),
-                label: 'লাইভ সেবা',
-              ),
-            ],
-          ),
-        ),
-        const SignalAuraOverlay(),
-      ],
-    );
+    return const Scaffold(body: Center(child: Text('Hello Developers')));
   }
 }
