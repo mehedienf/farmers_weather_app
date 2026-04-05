@@ -1,21 +1,22 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'providers/app_provider.dart';
-import 'providers/weather_provider.dart';
-import 'providers/forecast_provider.dart';
-import 'providers/admin_notification_provider.dart';
-
-import 'login.dart';
-import 'krishok_page.dart';
 import 'forecast_page.dart';
+import 'krishok_page.dart';
 import 'live_services_page.dart';
-import 'widgets/signal_aura.dart';
+import 'login.dart';
+import 'providers/admin_notification_provider.dart';
+import 'providers/app_provider.dart';
+import 'providers/forecast_provider.dart';
+import 'providers/weather_provider.dart';
 import 'services/notification_service.dart';
+import 'widgets/app_drawer.dart';
+import 'widgets/signal_aura.dart';
 
 const String _baseUrl = "https://flicksize.com/krishi_plus/";
 
@@ -210,20 +211,25 @@ class _MainNavigator extends StatefulWidget {
 
 class _MainNavigatorState extends State<_MainNavigator> {
   int _index = 0;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   void _goto(int i) => setState(() => _index = i);
 
   @override
   Widget build(BuildContext context) {
     final pages = [
-      KrishokPage(onMenuTap: () => _goto(1)),
-      ForecastPage(onMenuTap: () => _goto(1)),
-      LiveServicesPage(onMenuTap: () => _goto(0)),
+      KrishokPage(onMenuTap: () => _scaffoldKey.currentState?.openDrawer()),
+      ForecastPage(onMenuTap: () => _scaffoldKey.currentState?.openDrawer()),
+      LiveServicesPage(
+        onMenuTap: () => _scaffoldKey.currentState?.openDrawer(),
+      ),
     ];
 
     return Stack(
       children: [
         Scaffold(
+          key: _scaffoldKey,
+          drawer: const AppDrawer(),
           body: IndexedStack(index: _index, children: pages),
           bottomNavigationBar: NavigationBar(
             selectedIndex: _index,

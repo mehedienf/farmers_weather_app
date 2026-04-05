@@ -1,6 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _baseUrl = "https://flicksize.com/krishi_plus/";
@@ -101,8 +102,6 @@ class _LoginPageState extends State<LoginPage> {
       final message = otpData['message']?.toString() ?? '';
       final statusDetail = otpData['statusDetail']?.toString() ?? '';
       final statusCode = otpData['statusCode']?.toString().trim() ?? '';
-      final rawResponse = otpData['raw']?.toString() ?? '';
-      final httpCode = otpData['httpCode']?.toString() ?? '';
 
       if (success && referenceNo.isNotEmpty) {
         if (!mounted) return;
@@ -257,6 +256,17 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
   final TextEditingController _otpController = TextEditingController();
   bool _isLoading = false;
 
+  String _readString(Map<String, dynamic> data, List<String> keys) {
+    for (final key in keys) {
+      final value = data[key];
+      if (value != null) {
+        final text = value.toString().trim();
+        if (text.isNotEmpty) return text;
+      }
+    }
+    return '';
+  }
+
   Future<void> _verifyOtp() async {
     final otp = _otpController.text.trim();
     if (otp.isEmpty || otp.length < 4) {
@@ -272,7 +282,9 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
             Uri.parse('${_baseUrl}verify_otp.php'),
             body: {
               'Otp': otp,
+              'otp': otp,
               'referenceNo': widget.referenceNo,
+              'reference_no': widget.referenceNo,
               'user_mobile': widget.phone,
             },
           )
@@ -284,10 +296,16 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
         return;
       }
 
-      final statusCode =
-          data['statusCode']?.toString().trim().toUpperCase() ?? '';
+      final statusCode = _readString(data, [
+        'statusCode',
+        'StatusCode',
+        'status_code',
+      ]).toUpperCase();
+      final successFlag =
+          data['success'] == true ||
+          _readString(data, ['status', 'result']).toLowerCase() == 'success';
 
-      if (statusCode == 'S1000') {
+      if (statusCode == 'S1000' || successFlag) {
         // OTP verified successfully - save credentials immediately
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
@@ -305,8 +323,13 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
 
         Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
       } else {
-        final message = data['message']?.toString() ?? 'OTP ভুল হয়েছে';
-        _showError(message);
+        final message = _readString(data, [
+          'message',
+          'statusDetail',
+          'error',
+          'errorMessage',
+        ]);
+        _showError(message.isNotEmpty ? message : 'OTP ভুল হয়েছে');
       }
     } catch (e) {
       _showError('নেটওয়ার্ক সমস্যা হয়েছে: ${e.toString()}');

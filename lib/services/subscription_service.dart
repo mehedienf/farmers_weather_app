@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,8 +22,7 @@ class SubscriptionService {
 
   /// Check subscription status with caching and rate limiting
   Future<SubscriptionCheckResult> checkSubscription(String phone) async {
-    final prefs = await SharedPreferences.getInstance();
-
+    // Note: cached status handled by _getCachedStatus which accesses SharedPreferences
     // Check if we have a valid cached result
     final cachedResult = await _getCachedStatus(phone);
     if (cachedResult != null) {
@@ -349,6 +349,70 @@ class SubscriptionService {
     }
   }
 
+  /// Unsubscribe the given phone number from service.
+  /// Returns a result with success flag and an optional message.
+  Future<UnsubscribeResult> unsubscribe(String phone) async {
+    // Check API call limit
+    final canMakeApiCall = await _canMakeApiCall();
+    if (!canMakeApiCall) {
+      return UnsubscribeResult(
+        success: false,
+        message: 'Too many API requests. Please wait.',
+        apiCallsRemaining: 0,
+      );
+    }
+
+    try {
+      await _incrementApiCallCount();
+
+      final response = await http.post(
+        Uri.parse('$_baseUrl/unsubscribe.php'),
+        body: {'user_mobile': phone},
+      );
+
+      if (response.statusCode != 200) {
+        return UnsubscribeResult(
+          success: false,
+          message: 'HTTP ${response.statusCode}',
+          apiCallsRemaining: await _getRemainingApiCalls(),
+        );
+      }
+
+      dynamic parsed;
+      try {
+        parsed = jsonDecode(response.body);
+      } catch (_) {
+        parsed = response.body;
+      }
+
+      final data = parsed is Map<String, dynamic>
+          ? parsed
+          : <String, dynamic>{};
+
+      // Common success signals: explicit success flag or statusCode == S1000
+      final success =
+          data['success'] == true ||
+          (data['statusCode']?.toString().trim().toUpperCase() == 'S1000');
+
+      final message =
+          data['message']?.toString() ??
+          data['statusDetail']?.toString() ??
+          (success ? 'Unsubscribed' : 'Unsubscribe failed');
+
+      return UnsubscribeResult(
+        success: success,
+        message: message,
+        apiCallsRemaining: await _getRemainingApiCalls(),
+      );
+    } catch (e) {
+      return UnsubscribeResult(
+        success: false,
+        message: e.toString(),
+        apiCallsRemaining: await _getRemainingApiCalls(),
+      );
+    }
+  }
+
   /// Parse subscription status from API response
   bool _isSubscribedFromResponse(Map<String, dynamic> data) {
     final status =
@@ -404,6 +468,21 @@ class OtpVerifyResult {
   final int apiCallsRemaining;
 
   OtpVerifyResult({
+    required this.success,
+    this.message,
+    this.rateLimited = false,
+    required this.apiCallsRemaining,
+  });
+}
+
+/// Result of an unsubscribe call
+class UnsubscribeResult {
+  final bool success;
+  final String? message;
+  final bool rateLimited;
+  final int apiCallsRemaining;
+
+  UnsubscribeResult({
     required this.success,
     this.message,
     this.rateLimited = false,
