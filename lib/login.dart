@@ -311,17 +311,17 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
         await prefs.setBool('isLoggedIn', true);
         await prefs.setString('userPhone', widget.phone);
 
-        // Wait briefly for subscription sync, then continue to login.
+        // Wait briefly for subscription sync, then continue to home.
         final subscribed = await _waitForSubscriptionSync();
 
         if (!mounted) return;
         if (!subscribed) {
-          _showWarning('সাবস্ক্রিপশন চলছে। অনুগ্রহ করে কিছুক্ষণ পর লগইন করুন।');
+          _showWarning('সাবস্ক্রিপশন চলছে। অ্যাপ লোড হচ্ছে...');
           await Future.delayed(const Duration(seconds: 1));
           if (!mounted) return;
         }
 
-        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       } else {
         final message = _readString(data, [
           'message',
