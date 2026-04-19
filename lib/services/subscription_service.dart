@@ -389,10 +389,26 @@ class SubscriptionService {
           ? parsed
           : <String, dynamic>{};
 
-      // Common success signals: explicit success flag or statusCode == S1000
+      final statusCode =
+          (data['statusCode'] ?? data['StatusCode'] ?? data['status_code'])
+              ?.toString()
+              .trim()
+              .toUpperCase() ??
+          '';
+
       final success =
           data['success'] == true ||
-          (data['statusCode']?.toString().trim().toUpperCase() == 'S1000');
+          data['status']?.toString().trim().toLowerCase() == 'success' ||
+          data['result']?.toString().trim().toLowerCase() == 'success' ||
+          statusCode == 'S1000' ||
+          statusCode ==
+              'E1351' || // Sometime already unsubscribed/subscribed returns E errors but they are effectively out
+          (data['message']?.toString().toLowerCase().contains('unsubscribe') ==
+              true) ||
+          (data['statusDetail']?.toString().toLowerCase().contains(
+                'unsubscribe',
+              ) ==
+              true);
 
       final message =
           data['message']?.toString() ??

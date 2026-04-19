@@ -58,11 +58,18 @@ class AppDrawer extends StatelessWidget {
         );
       }
 
-      if (result.success) {
+      if (result.success ||
+          result.message != null &&
+              result.message!.toLowerCase().contains('http') == false &&
+              result.message!.toLowerCase().contains('too many api') == false) {
+        // If it was a success, or it was not a network/rate-limit error (e.g. backend responded), log them out
         await prefs.setBool('isLoggedIn', false);
         await prefs.remove('userPhone');
         if (context.mounted) {
-          Navigator.pushNamedAndRemoveUntil(context, '/login', (r) => false);
+          Navigator.of(
+            context,
+            rootNavigator: true,
+          ).pushNamedAndRemoveUntil('/login', (route) => false);
         }
       }
     } catch (e) {
@@ -107,7 +114,6 @@ class AppDrawer extends StatelessWidget {
                 style: TextStyle(color: Colors.red),
               ),
               onTap: () async {
-                Navigator.of(context).pop();
                 await _confirmAndUnsubscribe(context);
               },
             ),
