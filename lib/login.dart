@@ -203,6 +203,16 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 8),
               const Text('Robi/Airtel নম্বর দিন', textAlign: TextAlign.center),
+              const SizedBox(height: 8),
+              const Text(
+                '4 taka/Day subscription charge',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
               const SizedBox(height: 32),
               TextField(
                 controller: _phoneController,
