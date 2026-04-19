@@ -189,7 +189,7 @@ class NotificationService {
 
       // Also show in-app dialog for immediate visibility
       _showInAppAlert(warningLevel);
-    } catch (e, stackTrace) {
+    } catch (e) {
       // Fallback to in-app alert only
       _showInAppAlert(warningLevel);
     }

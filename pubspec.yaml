@@ -1,4 +1,4 @@
-name: testapp
+name: krishi_plus
 description: "Farmers & Weather App for Bangladesh"
 publish_to: "none"
 version: 1.0.0+1
@@ -60,5 +60,3 @@ flutter:
 
   assets:
     - assets/
-    - assets/icons/
-    - assets/images/

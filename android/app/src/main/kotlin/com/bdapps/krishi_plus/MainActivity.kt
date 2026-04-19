@@ -1,4 +1,4 @@
-package com.disastermgmt.krishi_seba_plus
+package com.bdapps.krishi_plus
 
 import io.flutter.embedding.android.FlutterActivity
 

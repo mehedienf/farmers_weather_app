@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.disastermgmt.krishi_seba_plus"
+    namespace = "com.bdapps.krishi_plus"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -22,7 +22,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.disastermgmt.krishi_seba_plus"
+        applicationId = "com.bdapps.krishi_plus"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion  // webview_flutter requires API 19+
