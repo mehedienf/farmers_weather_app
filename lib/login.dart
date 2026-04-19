@@ -205,7 +205,8 @@ class _LoginPageState extends State<LoginPage> {
               const Text('Robi/Airtel নম্বর দিন', textAlign: TextAlign.center),
               const SizedBox(height: 8),
               const Text(
-                '4 taka/Day subscription charge',
+                // 'Daily 4 taka(VAT+SD+SC) subscription charge',
+                'This app charge for Robi/Airtel 4 taka (VAT+SD+SC) daily subscription fee',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.red,
