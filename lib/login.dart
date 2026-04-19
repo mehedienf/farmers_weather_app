@@ -206,7 +206,7 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 8),
               const Text(
                 // 'Daily 4 taka(VAT+SD+SC) subscription charge',
-                'This app charge for Robi/Airtel 4 taka (VAT+SD+SC) daily subscription fee',
+                'This app charge for Robi/Airtel 2 taka (VAT+SD+SC) daily subscription fee',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.red,
