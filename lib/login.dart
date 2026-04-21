@@ -204,12 +204,12 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 8),
               const Text('Robi/Airtel নম্বর দিন', textAlign: TextAlign.center),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 // 'Daily 4 taka(VAT+SD+SC) subscription charge',
-                'This app charge for Robi/Airtel 2 taka (VAT+SD+SC) daily subscription fee',
+                'চার্জ 2 টাকা + VAT+SD+SC/দিন',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.red,
+                  color: Colors.grey.shade600,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -479,7 +479,7 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: _isLoading ? null : () => Navigator.pop(context),
-                  child: const Text('ভুল নম্বর? পিছনে যাও'),
+                  child: const Text('ভুল নম্বর? সঠিক নম্বর দিয়ে আবার চেষ্টা করুন'),
                 ),
               ],
             ),

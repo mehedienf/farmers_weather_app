@@ -23,7 +23,7 @@ class AppProvider extends ChangeNotifier {
   String _dateTimeString = '';
   bool _isLocating = false;
   String? _locationError;
-  String _sosNumber = '999'; // Default SOS number
+  String _sosNumber = '16123'; // Default SOS number
 
   // ──────────────────────────────────────────────────────────────────────────
   // Getters
